@@ -1,0 +1,79 @@
+<!-- success.ejs -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Success</title>
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f5f5f5;
+    }
+
+    main {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      width: 300px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    p {
+      color: #333;
+      margin-bottom: 10px;
+    }
+
+    .logout-link {
+      text-align: center;
+      margin-top: 15px;
+    }
+
+    .logout-link a {
+      color: #dc3545;
+      text-decoration: none;
+    }
+
+    .logout-link a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Welcome to the Success Page</h1>
+    <% if (user) { %>
+      <p><strong>Username:</strong> <%= user.username %></p>
+      <p><strong>First Name:</strong> <%= user.firstName %></p>
+      <p><strong>Last Name:</strong> <%= user.lastName %></p>
+      <p><strong>Date of Birth:</strong>
+        <% if (user.dateOfBirth) { %>
+          <% if (typeof user.dateOfBirth === 'string') {
+            user.dateOfBirth = new Date(user.dateOfBirth);
+          } %>
+          <%= user.dateOfBirth.toLocaleDateString() %>
+        <% } else { %>
+          N/A
+        <% } %>
+      </p>
+      
+      <p><strong>Email:</strong> <%= user.email %></p>
+    <% } else { %>
+      <p>No user details found.</p>
+    <% } %>
+    <div class="logout-link">
+      <a href="/logout">Logout</a>
+    </div>
+  </main>
+</body>
+</html>

@@ -12,13 +12,11 @@ const app = express();
 const port = process.env.PORT || 3000;
 app.use(express.static(path.join(__dirname, "public")));
 
-// Connect to MongoDB Atlas
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
 
-// Set up middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.set("view engine", "ejs");
@@ -30,7 +28,6 @@ app.use(
   })
 );
 
-// Define User schema and model
 const userSchema = new mongoose.Schema({
   username: String,
   password: String,
@@ -42,7 +39,14 @@ const userSchema = new mongoose.Schema({
 
 const User = mongoose.model("User", userSchema);
 
-// Routes
+const loginSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, required: true },
+  username: String,
+  password: String,
+});
+
+const Login = mongoose.model("Login", loginSchema);
+
 app.get("/", (req, res) => {
   res.render("index");
 });
@@ -64,7 +68,17 @@ app.post("/signup", async (req, res) => {
       dateOfBirth,
       email,
     });
-    await newUser.save();
+
+    const savedUser = await newUser.save();
+
+    const newLogin = new Login({
+      userId: savedUser._id,
+      username,
+      password,
+    });
+
+    await newLogin.save();
+
     res.redirect("/login");
   } catch (err) {
     console.error(err);
@@ -80,13 +94,19 @@ app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const user = await User.findOne({ username, password });
-    if (user) {
-      req.session.user = user;
-      res.redirect("/dashboard");
-    } else {
-      res.redirect("/login");
+    const loginDetails = await Login.findOne({ username, password });
+
+    if (loginDetails) {
+      const user = await User.findOne({ _id: loginDetails.userId }); // Corrected field name
+
+      if (user) {
+        req.session.user = user;
+        res.redirect("/dashboard");
+        return;
+      }
     }
+
+    res.redirect("/login");
   } catch (err) {
     console.error(err);
     res.redirect("/login");
@@ -107,13 +127,22 @@ app.get("/dashboard", async (req, res) => {
   }
 });
 
+app.get("/success", (req, res) => {
+  if (req.session.user) {
+    const user = req.session.user;
+    res.render("success", { user });
+  } else {
+    res.redirect("/login");
+  }
+});
+
 app.get("/logout", (req, res) => {
   req.session.destroy((err) => {
     if (err) {
       console.error(err);
       res.status(500).send("Internal Server Error");
     } else {
-      res.redirect("/login"); // Redirect to the login page after logout
+      res.redirect("/login");
     }
   });
 });
