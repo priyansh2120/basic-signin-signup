@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,20 +12,23 @@
       justify-content: center;
       height: 100vh;
       margin: 0;
-      background-color: #f5f5f5;
+      background-color: #f8f9fa;
+      font-family: 'Arial', sans-serif;
     }
 
     main {
       background-color: #fff;
       border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      padding: 20px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
       width: 80%;
+      text-align: center;
     }
 
     h1 {
-      text-align: center;
       color: #333;
+      font-size: 28px;
+      margin-bottom: 20px;
     }
 
     table {
@@ -37,31 +39,25 @@
 
     th, td {
       border: 1px solid #ddd;
-      padding: 10px;
+      padding: 12px;
       text-align: left;
     }
 
     a {
       color: #007bff;
       text-decoration: none;
+      display: inline-block;
+      margin-top: 15px; /* Adjust the margin as needed */
+      padding: 8px;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: #fff;
+      transition: background-color 0.3s;
     }
 
     a:hover {
-      text-decoration: underline;
-    }
-
-    .logout-link {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .logout-link a {
-      color: #dc3545;
+      background-color: #0056b3;
       text-decoration: none;
-    }
-
-    .logout-link a:hover {
-      text-decoration: underline;
     }
   </style>
 </head>
@@ -92,12 +88,10 @@
         <% }); %>
       </tbody>
     </table>
-    <div class="logout-link">
-      <a href="/logout">Logout</a>
-    </div>
-    <div class="success-link">
-      <a href="/success">Go to Success Page</a>
-    </div>
+    <a href="/logout">Logout</a>
+    <a href="/success">Go to Success Page</a>
+    <a href="/login-data">Go to Login Data Admin Panel</a>
+    <a href="/user-data">Go to User Data Admin Panel</a>
   </main>
 </body>
 </html>

@@ -150,3 +150,41 @@ app.get("/logout", (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
+
+app.get("/user-data", async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.render("user-data", { users });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/login-data", async (req, res) => {
+  try {
+    const logins = await Login.find({});
+    res.render("login-data", { logins });
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.post("/delete-user/:userId", async (req, res) => {
+  const userId = req.params.userId;
+
+  try {
+    // Delete user from the users collection
+    await User.findByIdAndDelete(userId);
+
+    // Delete login from the signins collection
+    await Login.findOneAndDelete({ userId });
+
+    // Redirect back to the user-data page after deletion
+    res.redirect("/user-data");
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
