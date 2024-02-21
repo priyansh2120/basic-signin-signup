@@ -21,6 +21,12 @@
       background-color: #f2f2f2;
     }
   </style>
+  <script>
+    // Function to show a pop-up message
+    function showDeleteConfirmation() {
+      alert("User deleted successfully!");
+    }
+  </script>
 </head>
 <body>
   <h1>User Data</h1>
@@ -45,7 +51,7 @@
             <td><%= user.dateOfBirth ? user.dateOfBirth.toLocaleDateString() : 'N/A' %></td>
             <td><%= user.email %></td>
             <td>
-              <form method="post" action="/delete-user/<%= user._id %>">
+              <form method="post" action="/delete-user/<%= user._id %>" onsubmit="showDeleteConfirmation()">
                 <button type="submit">Delete</button>
               </form>
             </td>
