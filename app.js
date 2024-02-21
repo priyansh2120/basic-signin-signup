@@ -5,6 +5,7 @@ const session = require("express-session");
 const ejs = require("ejs");
 const dotenv = require("dotenv");
 const path = require("path");
+const bcrypt = require("bcrypt");
 
 dotenv.config();
 
@@ -55,14 +56,19 @@ app.get("/signup", (req, res) => {
   res.render("signup");
 });
 
+const saltRounds = 10; // Number of salt rounds for bcrypt
+
 app.post("/signup", async (req, res) => {
   const { username, password, firstName, lastName, dateOfBirth, email } =
     req.body;
 
   try {
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
     const newUser = new User({
       username,
-      password,
+      password: hashedPassword, // Store the hashed password
       firstName,
       lastName,
       dateOfBirth,
@@ -74,7 +80,7 @@ app.post("/signup", async (req, res) => {
     const newLogin = new Login({
       userId: savedUser._id,
       username,
-      password,
+      password: hashedPassword, // Store the hashed password
     });
 
     await newLogin.save();
@@ -94,15 +100,23 @@ app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    const loginDetails = await Login.findOne({ username, password });
+    const loginDetails = await Login.findOne({ username });
 
     if (loginDetails) {
-      const user = await User.findOne({ _id: loginDetails.userId }); // Corrected field name
+      // Compare the hashed password
+      const passwordMatch = await bcrypt.compare(
+        password,
+        loginDetails.password
+      );
 
-      if (user) {
-        req.session.user = user;
-        res.redirect("/dashboard");
-        return;
+      if (passwordMatch) {
+        const user = await User.findOne({ _id: loginDetails.userId });
+
+        if (user) {
+          req.session.user = user;
+          res.redirect("/dashboard");
+          return;
+        }
       }
     }
 
