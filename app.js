@@ -307,6 +307,7 @@ app.get(
   passport.authenticate("google", { failureRedirect: "/login" }),
   (req, res) => {
     if (req.user.profileComplete) {
+      req.session.user = req.user;
       res.redirect("/dashboard");
     } else {
       res.redirect("/complete-profile");
@@ -337,6 +338,7 @@ app.post("/signup", async (req, res) => {
       lastName,
       dateOfBirth,
       email,
+      profileComplete: true,
     });
 
     // Save the new user to the database
@@ -410,7 +412,11 @@ app.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ username });
     if (user && (await bcrypt.compare(password, user.password))) {
+      // Log the retrieved user object
+      console.log("User found:", user);
+      // Set the user object to session
       req.session.user = user;
+      // Redirect to dashboard or success page
       res.redirect("/dashboard");
     } else {
       res.redirect("/login");
@@ -454,8 +460,9 @@ app.post("/complete-profile", async (req, res) => {
   }
 });
 
-app.get("/success", ensureAuthenticated, (req, res) => {
+app.get("/success", (req, res) => {
   const user = req.user || req.session.user;
+  console.log("User found: in success", user);
   res.render("success", { user });
 });
 
